@@ -18,7 +18,7 @@ function renderHeader() {
   target.className = "site-header";
   target.innerHTML = `<div class="header-inner">
     <a href="index.html" class="brand" aria-label="i-Proclaim Research Academy home">
-      <img src="i-proclaim-logo.png" alt="i-Proclaim.com"><span class="brand-academy">Research Academy</span>
+      <img src="i-proclaim-logo.png" alt="i-Proclaim.com">
     </a>
     <button class="menu-button" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
     <nav class="nav" aria-label="Main navigation">${pages.map(([href,label]) => `<a href="${href}"${active === href ? ' class="active" aria-current="page"' : ""}>${label}</a>`).join("")}</nav>
@@ -37,7 +37,7 @@ function renderFooter() {
   if (!target) return;
   target.className = "footer";
   target.innerHTML = `<div class="footer-grid">
-    <div class="footer-about"><a href="index.html" class="footer-brand"><img src="i-proclaim-logo.png" alt="i-Proclaim.com"><span>Research Academy</span></a><p>An independent platform supporting scholarly publication, research development, academic collaboration and responsible knowledge dissemination.</p><p><a href="mailto:editor@i-proclaim.com">editor@i-proclaim.com</a><br>Malaysia</p></div>
+    <div class="footer-about"><a href="index.html" class="footer-brand"><img src="i-proclaim-logo.png" alt="i-Proclaim.com"></a><p>An independent platform supporting scholarly publication, research development, academic collaboration and responsible knowledge dissemination.</p><address class="contact-block"><strong>Contact</strong><a href="tel:+601156517351">+60 11-5651 7351</a><span>Kuala Lumpur, Malaysia</span><span>21-09-06, Taman Bukit Angkasa,<br>Off Pantai Dalam, 59200 Kuala Lumpur, Malaysia</span><strong>Support Email</strong><a href="mailto:support@i-proclaim.my">support@i-proclaim.my</a></address></div>
     <div><h2>Journals</h2><a href="journals.html">Current Journals</a><a href="https://i-proclaim.my/journals/" target="_blank" rel="noreferrer">OJS Archive</a><span>For Authors</span></div>
     <div><h2>Awards</h2><a href="awards.html">Research Awards</a><span>Publication Excellence</span><span>Book Awards</span></div>
     <div><h2>Research Services</h2><a href="research-services.html">Publishing Support</a><span>Digital Library Support</span><span>Conferences</span><span>Society Partnerships</span></div>
