@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://uprightpub.github.io/i-proclaim/sitemap.xml
