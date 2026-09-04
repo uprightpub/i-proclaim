@@ -72,3 +72,16 @@
 @media(max-width:520px){.research-meet-logo-orbit{width:min(82vw,330px)}.research-meet-hero:after{width:300px;height:300px;bottom:40px}}
 @media(prefers-reduced-motion:reduce){.research-meet-logo-orbit img,.research-meet-orbit-ring{animation:none}}
 .award-video-window{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}.award-video-window::-webkit-scrollbar{display:none}
+
+/* Publication Citation hero logo */
+.citation-award-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,430px);align-items:center;gap:clamp(30px,5vw,86px);min-height:560px}
+.citation-award-hero:after{right:10%;width:430px;height:430px;box-shadow:0 0 0 38px rgba(255,255,255,.025),0 0 0 78px rgba(255,255,255,.018)}
+.citation-award-hero .hero-copy{max-width:760px}
+.citation-logo-orbit{position:relative;z-index:2;width:min(32vw,410px);aspect-ratio:1;margin-inline:auto;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 38% 30%,rgba(255,255,255,.17),rgba(110,190,75,.1) 50%,rgba(0,15,30,.2) 74%);border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 0 38px rgba(255,255,255,.07),0 30px 60px rgba(0,0,0,.28);overflow:hidden}
+.citation-logo-ring{position:absolute;inset:7%;border:1px dashed rgba(164,222,126,.48);border-radius:50%;animation:citationLogoRing 26s linear infinite}
+.citation-logo-orbit img{display:block;width:50%;height:auto;object-fit:contain;filter:drop-shadow(0 15px 18px rgba(0,0,0,.3));animation:citationLogoFloat 9s ease-in-out infinite;will-change:transform}
+@keyframes citationLogoFloat{0%,100%{transform:translate(-7px,-5px) rotate(-.7deg)}25%{transform:translate(8px,-9px) rotate(.7deg)}50%{transform:translate(9px,7px) rotate(-.35deg)}75%{transform:translate(-8px,9px) rotate(.7deg)}}
+@keyframes citationLogoRing{to{transform:rotate(360deg)}}
+@media(max-width:900px){.citation-award-hero{grid-template-columns:1fr;min-height:auto}.citation-award-hero:after{display:block;right:50%;top:auto;bottom:55px;transform:translateX(50%);width:360px;height:360px}.citation-logo-orbit{width:min(78vw,380px);margin-top:18px}}
+@media(max-width:520px){.citation-logo-orbit{width:min(82vw,330px)}.citation-award-hero:after{width:300px;height:300px;bottom:40px}}
+@media(prefers-reduced-motion:reduce){.citation-logo-orbit img,.citation-logo-ring{animation:none}}
