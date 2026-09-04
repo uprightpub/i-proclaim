@@ -82,3 +82,7 @@
 @media(max-width:1050px){.partnership-hero{grid-template-columns:1fr 1fr}.meaning-layout,.responsibility-section{grid-template-columns:1fr}.model-grid,.engagement-grid{grid-template-columns:1fr 1fr}.audience-grid,.value-grid,.partnership-path ol{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.partnership-hero{grid-template-columns:1fr;padding:68px 22px;gap:45px}.partnership-visual{width:min(82vw,400px)}.meaning-layout,.model-grid,.audience-grid,.responsibility-columns,.engagement-grid,.partnership-path ol,.value-grid{grid-template-columns:1fr}.partnership-models,.responsibility-section,.partnership-path{padding:68px 22px}}
 @media(prefers-reduced-motion:reduce){.partner-core,.partner-node{animation:none!important}}
+
+/* Awards hero video */
+.award-hero-video{position:relative;min-height:610px;overflow:hidden;background:#020d18}.award-hero-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;transform:scale(1.015)}
+@media(max-width:760px){.award-hero-video{min-height:350px}}
