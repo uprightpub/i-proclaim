@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const base = "media/awards/";
+  const base = "";
   const mediaSets = {
     book: {
       heading: "Book Award stories",
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player?.destroy) player.destroy(); player = null; stage.innerHTML = ""; caption.textContent = title;
     modal.classList.remove("photo-mode"); openModal();
     if (type === "local") {
-      const video = document.createElement("video"); video.controls = true; video.autoplay = true; video.playsInline = true; video.src = `${base}videos/${id}.mp4`; video.poster = `${base}posters/${id}.jpg`; video.addEventListener("ended", () => playVideo(activeVideoIndex + 1)); stage.appendChild(video);
+      const video = document.createElement("video"); video.controls = true; video.autoplay = true; video.playsInline = true; video.src = `${base}${id}.mp4`; video.poster = `${base}${id}.jpg`; video.addEventListener("ended", () => playVideo(activeVideoIndex + 1)); stage.appendChild(video);
     } else {
       const holder = document.createElement("div"); holder.id = `youtube-player-${Date.now()}`; stage.appendChild(holder);
       ensureYouTube(() => { player = new YT.Player(holder.id,{videoId:id,playerVars:{autoplay:1,rel:0,playsinline:1},events:{onStateChange:event=>{if(event.data===YT.PlayerState.ENDED) playVideo(activeVideoIndex+1);}}}); });
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     photoIndex = (index + photoList.length) % photoList.length;
     const [src, alt, direct=false] = photoList[photoIndex];
     if (player?.destroy) player.destroy(); player = null; stage.innerHTML = "";
-    const image = document.createElement("img"); image.src = direct ? src : `${base}images/${src}`; image.alt = alt; stage.appendChild(image); caption.textContent = alt; modal.classList.add("photo-mode"); openModal();
+    const image = document.createElement("img"); image.src = direct ? src : `${base}${src}`; image.alt = alt; stage.appendChild(image); caption.textContent = alt; modal.classList.add("photo-mode"); openModal();
   }
   modal.querySelector(".media-modal-prev").addEventListener("click", () => modal.classList.contains("photo-mode") ? openPhoto(photoIndex-1) : playVideo(activeVideoIndex-1));
   modal.querySelector(".media-modal-next").addEventListener("click", () => modal.classList.contains("photo-mode") ? openPhoto(photoIndex+1) : playVideo(activeVideoIndex+1));
@@ -115,8 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("[data-award-media]").forEach(section => {
     const set = mediaSets[section.dataset.awardMedia]; if (!set) return;
-    const cards = set.videos.map(([type,id,title],index) => `<button class="award-video-card" type="button" data-video-index="${index}"><span class="award-video-thumb" style="background-image:url('${type === "youtube" ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : `${base}posters/${id}.jpg`}')"><i>▶</i></span><strong>${title}</strong><small>Watch video</small></button>`).join("");
-    section.innerHTML = `<div class="award-media-heading"><div><span class="award-kicker">Media archive</span><h2>${set.heading}</h2><p>${set.intro}</p></div><div class="award-media-controls"><button type="button" data-track-prev aria-label="Previous videos">‹</button><button type="button" data-track-next aria-label="Next videos">›</button></div></div><div class="award-video-window"><div class="award-video-track">${cards}${cards}</div></div>${set.photos ? `<div class="award-photo-heading"><span class="award-kicker">Photo archive</span><h2>Moments from the programme</h2></div><div class="award-photo-grid">${set.photos.map(([src,alt],i)=>`<button type="button" data-photo-index="${i}"><img src="${base}images/${src}" alt="${alt}" loading="lazy"><span>${alt}</span></button>`).join("")}</div>` : ""}`;
+    const cards = set.videos.map(([type,id,title],index) => `<button class="award-video-card" type="button" data-video-index="${index}"><span class="award-video-thumb" style="background-image:url('${type === "youtube" ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : `${base}${id}.jpg`}')"><i>▶</i></span><strong>${title}</strong><small>Watch video</small></button>`).join("");
+    section.innerHTML = `<div class="award-media-heading"><div><span class="award-kicker">Media archive</span><h2>${set.heading}</h2><p>${set.intro}</p></div><div class="award-media-controls"><button type="button" data-track-prev aria-label="Previous videos">‹</button><button type="button" data-track-next aria-label="Next videos">›</button></div></div><div class="award-video-window"><div class="award-video-track">${cards}${cards}</div></div>${set.photos ? `<div class="award-photo-heading"><span class="award-kicker">Photo archive</span><h2>Moments from the programme</h2></div><div class="award-photo-grid">${set.photos.map(([src,alt],i)=>`<button type="button" data-photo-index="${i}"><img src="${base}${src}" alt="${alt}" loading="lazy"><span>${alt}</span></button>`).join("")}</div>` : ""}`;
     const track = section.querySelector(".award-video-track");
     const videoWindow = section.querySelector(".award-video-window");
     section.querySelectorAll("[data-video-index]").forEach(button => button.addEventListener("click", () => { activeVideos=set.videos; playVideo(+button.dataset.videoIndex); }));
