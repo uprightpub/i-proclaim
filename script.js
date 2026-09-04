@@ -58,22 +58,27 @@ const videos = [
 function renderCarousels() {
   document.querySelectorAll("[data-video-carousel]").forEach(section => {
     let start = 0;
+    let autoAdvance;
+    let isPlaying = false;
     const grid = section.querySelector(".video-grid");
     const draw = () => {
+      if (isPlaying) return;
       grid.innerHTML = Array.from({length: 4}, (_, i) => videos[(start + i) % videos.length]).map(([id, caption]) => `<article class="video-card"><button class="video-thumb" type="button" data-video="${id}" data-caption="${caption}" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')" aria-label="Play ${caption}"><span>▶</span></button><h3>${caption}</h3></article>`).join("");
       grid.querySelectorAll("[data-video]").forEach(button => button.addEventListener("click", () => {
+        isPlaying = true;
+        clearInterval(autoAdvance);
         const iframe = document.createElement("iframe");
-        iframe.src = `https://www.youtube.com/embed/${button.dataset.video}?autoplay=1`;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${button.dataset.video}?autoplay=1&rel=0&playsinline=1`;
         iframe.title = button.dataset.caption;
         iframe.allow = "autoplay; encrypted-media; picture-in-picture";
         iframe.allowFullscreen = true;
         button.replaceWith(iframe);
       }));
     };
-    section.querySelector("[data-prev]").addEventListener("click", () => { start = (start - 1 + videos.length) % videos.length; draw(); });
-    section.querySelector("[data-next]").addEventListener("click", () => { start = (start + 1) % videos.length; draw(); });
+    section.querySelector("[data-prev]").addEventListener("click", () => { isPlaying = false; start = (start - 1 + videos.length) % videos.length; draw(); });
+    section.querySelector("[data-next]").addEventListener("click", () => { isPlaying = false; start = (start + 1) % videos.length; draw(); });
     draw();
-    setInterval(() => { start = (start + 1) % videos.length; draw(); }, 5000);
+    autoAdvance = setInterval(() => { start = (start + 1) % videos.length; draw(); }, 5000);
   });
 }
 
