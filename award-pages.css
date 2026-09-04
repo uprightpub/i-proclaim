@@ -98,3 +98,12 @@
 @media(max-width:900px){.excellence-award-hero{grid-template-columns:1fr;min-height:auto}.excellence-award-hero:after{display:block;right:50%;top:auto;bottom:55px;transform:translateX(50%);width:360px;height:360px}.excellence-logo-orbit{width:min(78vw,380px);margin-top:18px}}
 @media(max-width:520px){.excellence-logo-orbit{width:min(82vw,330px)}.excellence-award-hero:after{width:300px;height:300px;bottom:40px}}
 @media(prefers-reduced-motion:reduce){.excellence-logo-orbit img,.excellence-logo-ring{animation:none}}
+
+/* Publication Citation gallery: six compact photographs in one row */
+[data-award-media="citation"] .award-photo-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:auto;gap:10px;max-width:1260px;overflow:visible}
+[data-award-media="citation"] .award-photo-grid button,[data-award-media="citation"] .award-photo-grid button:nth-child(1),[data-award-media="citation"] .award-photo-grid button:nth-child(5){grid-column:auto;grid-row:auto;width:100%;aspect-ratio:4/3;border-radius:11px;box-shadow:0 8px 22px rgba(5,43,80,.12)}
+[data-award-media="citation"] .award-photo-grid img{width:100%;height:100%;object-fit:cover}
+[data-award-media="citation"] .award-photo-grid button:hover{z-index:2;box-shadow:0 14px 32px rgba(5,43,80,.22)}
+[data-award-media="citation"] .award-photo-grid button:hover img{transform:scale(1.07)}
+[data-award-media="citation"] .award-photo-grid span{padding:26px 9px 9px;font-size:11px;line-height:1.2}
+@media(max-width:900px){[data-award-media="citation"] .award-photo-grid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 0 12px;scrollbar-width:thin}[data-award-media="citation"] .award-photo-grid button,[data-award-media="citation"] .award-photo-grid button:nth-child(1),[data-award-media="citation"] .award-photo-grid button:nth-child(5){flex:0 0 210px;width:210px;aspect-ratio:4/3;scroll-snap-align:start}}
