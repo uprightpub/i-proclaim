@@ -68,17 +68,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  let activeVideos = [], activeVideoIndex = 0, player = null, photoList = [], photoIndex = 0;
+  let activeVideos = [], activeVideoIndex = 0, player = null, photoList = [], photoIndex = 0, lastFocus = null;
   const modal = document.createElement("div");
   modal.className = "media-modal";
   modal.setAttribute("aria-hidden", "true");
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-label", "Media viewer");
   modal.innerHTML = `<button class="media-modal-close" type="button" aria-label="Close">×</button><button class="media-modal-prev" type="button" aria-label="Previous">‹</button><div class="media-modal-stage"></div><button class="media-modal-next" type="button" aria-label="Next">›</button><p class="media-modal-caption"></p>`;
   document.body.appendChild(modal);
   const stage = modal.querySelector(".media-modal-stage");
   const caption = modal.querySelector(".media-modal-caption");
 
-  function openModal() { modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.classList.add("modal-open"); }
-  function closeModal() { if (player?.destroy) player.destroy(); player = null; stage.innerHTML = ""; modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.classList.remove("modal-open"); }
+  function setTrackState(section, paused) {
+    const track = section.querySelector(".award-video-track");
+    if (track) track.style.animationPlayState = paused ? "paused" : "running";
+    section.querySelector(".award-video-window")?.classList.toggle("is-paused", paused);
+  }
+  function pauseAllTracks() { document.querySelectorAll("[data-award-media]").forEach(section => setTrackState(section, true)); }
+  function resumeEligibleTracks() {
+    document.querySelectorAll("[data-award-media]").forEach(section => {
+      const userPaused = section.querySelector(".award-video-window")?.dataset.userPaused === "true";
+      setTrackState(section, userPaused || matchMedia("(max-width:850px)").matches || matchMedia("(prefers-reduced-motion:reduce)").matches);
+    });
+  }
+  function openModal() {
+    lastFocus = document.activeElement;
+    pauseAllTracks();
+    modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.classList.add("modal-open");
+    modal.querySelector(".media-modal-close").focus();
+  }
+  function closeModal() {
+    if (player?.destroy) player.destroy(); player = null; stage.innerHTML = "";
+    modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); document.body.classList.remove("modal-open");
+    resumeEligibleTracks();
+    if (lastFocus?.focus) lastFocus.focus();
+  }
   modal.querySelector(".media-modal-close").addEventListener("click", closeModal);
   modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 
@@ -96,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player?.destroy) player.destroy(); player = null; stage.innerHTML = ""; caption.textContent = title;
     modal.classList.remove("photo-mode"); openModal();
     if (type === "local") {
-      const video = document.createElement("video"); video.controls = true; video.autoplay = true; video.playsInline = true; video.src = `${base}${id}.mp4`; video.poster = `${base}${id}.jpg`; video.addEventListener("ended", () => playVideo(activeVideoIndex + 1)); stage.appendChild(video);
+      const video = document.createElement("video"); video.controls = true; video.autoplay = true; video.preload = "metadata"; video.playsInline = true; video.src = `${base}${id}.mp4`; video.poster = `${base}${id}.jpg`; video.addEventListener("ended", () => playVideo(activeVideoIndex + 1)); stage.appendChild(video);
     } else {
       const holder = document.createElement("div"); holder.id = `youtube-player-${Date.now()}`; stage.appendChild(holder);
       ensureYouTube(() => { player = new YT.Player(holder.id,{videoId:id,playerVars:{autoplay:1,rel:0,playsinline:1},events:{onStateChange:event=>{if(event.data===YT.PlayerState.ENDED) playVideo(activeVideoIndex+1);}}}); });
@@ -111,15 +136,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   modal.querySelector(".media-modal-prev").addEventListener("click", () => modal.classList.contains("photo-mode") ? openPhoto(photoIndex-1) : playVideo(activeVideoIndex-1));
   modal.querySelector(".media-modal-next").addEventListener("click", () => modal.classList.contains("photo-mode") ? openPhoto(photoIndex+1) : playVideo(activeVideoIndex+1));
-  document.addEventListener("keydown", e => { if (!modal.classList.contains("open")) return; if(e.key==="Escape") closeModal(); if(e.key==="ArrowLeft") modal.querySelector(".media-modal-prev").click(); if(e.key==="ArrowRight") modal.querySelector(".media-modal-next").click(); });
+  document.addEventListener("keydown", e => {
+    if (!modal.classList.contains("open")) return;
+    if(e.key==="Escape") closeModal();
+    if(e.key==="ArrowLeft") modal.querySelector(".media-modal-prev").click();
+    if(e.key==="ArrowRight") modal.querySelector(".media-modal-next").click();
+    if(e.key==="Tab") {
+      const controls=[...modal.querySelectorAll("button,[href],video[controls]")].filter(item=>!item.hidden);
+      if(!controls.length)return;
+      const first=controls[0], last=controls[controls.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+    }
+  });
 
   document.querySelectorAll("[data-award-media]").forEach(section => {
     const set = mediaSets[section.dataset.awardMedia]; if (!set) return;
     const cards = set.videos.map(([type,id,title],index) => `<button class="award-video-card" type="button" data-video-index="${index}"><span class="award-video-thumb" style="background-image:url('${type === "youtube" ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : `${base}${id}.jpg`}')"><i>▶</i></span><strong>${title}</strong><small>Watch video</small></button>`).join("");
-    section.innerHTML = `<div class="award-media-heading"><div><span class="award-kicker">Media archive</span><h2>${set.heading}</h2><p>${set.intro}</p></div><div class="award-media-controls"><button type="button" data-track-prev aria-label="Previous videos">‹</button><button type="button" data-track-next aria-label="Next videos">›</button></div></div><div class="award-video-window"><div class="award-video-track">${cards}${cards}</div></div>${set.photos ? `<div class="award-photo-heading"><span class="award-kicker">Photo archive</span><h2>Moments from the programme</h2></div><div class="award-photo-grid">${set.photos.map(([src,alt],i)=>`<button type="button" data-photo-index="${i}"><img src="${base}${src}" alt="${alt}" loading="lazy"><span>${alt}</span></button>`).join("")}</div>` : ""}`;
+    section.innerHTML = `<div class="award-media-heading"><div><span class="award-kicker">Media archive</span><h2>${set.heading}</h2><p>${set.intro}</p></div><div class="award-media-controls"><button type="button" data-track-pause aria-label="Pause automatic video scrolling" aria-pressed="false">Ⅱ</button><button type="button" data-track-prev aria-label="Previous videos">‹</button><button type="button" data-track-next aria-label="Next videos">›</button></div></div><div class="award-video-window" data-user-paused="false"><div class="award-video-track">${cards}${cards}</div></div>${set.photos ? `<div class="award-photo-heading"><span class="award-kicker">Photo archive</span><h2>Moments from the programme</h2></div><div class="award-photo-grid">${set.photos.map(([src,alt],i)=>`<button type="button" data-photo-index="${i}"><img src="${base}${src}" alt="${alt}" loading="lazy" decoding="async"><span>${alt}</span></button>`).join("")}</div>` : ""}`;
     const track = section.querySelector(".award-video-track");
     const videoWindow = section.querySelector(".award-video-window");
-    section.querySelectorAll("[data-video-index]").forEach(button => button.addEventListener("click", () => { activeVideos=set.videos; playVideo(+button.dataset.videoIndex); }));
+    const pauseButton = section.querySelector("[data-track-pause]");
+    const pause = () => setTrackState(section, true);
+    const resume = () => { if(videoWindow.dataset.userPaused !== "true" && !modal.classList.contains("open")) setTrackState(section, false); };
+    videoWindow.addEventListener("pointerenter", pause);
+    videoWindow.addEventListener("pointerdown", pause, {passive:true});
+    videoWindow.addEventListener("pointerleave", resume);
+    videoWindow.addEventListener("focusin", pause);
+    videoWindow.addEventListener("focusout", event => { if(!videoWindow.contains(event.relatedTarget)) resume(); });
+    pauseButton.addEventListener("click", () => {
+      const paused = videoWindow.dataset.userPaused !== "true";
+      videoWindow.dataset.userPaused = String(paused);
+      pauseButton.setAttribute("aria-pressed", String(paused));
+      pauseButton.setAttribute("aria-label", paused ? "Resume automatic video scrolling" : "Pause automatic video scrolling");
+      pauseButton.textContent = paused ? "▶" : "Ⅱ";
+      setTrackState(section, paused);
+    });
+    section.querySelectorAll("[data-video-index]").forEach(button => button.addEventListener("click", () => { pause(); activeVideos=set.videos; playVideo(+button.dataset.videoIndex); }));
     section.querySelector("[data-track-prev]").addEventListener("click", () => { track.style.animationPlayState="paused"; videoWindow.scrollBy({left:-330,behavior:"smooth"}); });
     section.querySelector("[data-track-next]").addEventListener("click", () => { track.style.animationPlayState="paused"; videoWindow.scrollBy({left:330,behavior:"smooth"}); });
     section.querySelectorAll("[data-photo-index]").forEach(button => button.addEventListener("click", () => { photoList=set.photos; openPhoto(+button.dataset.photoIndex); }));
