@@ -83,9 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateScores() {
     const completion=completionScore(), readiness=readinessScore();
-    form.querySelector("#completionValue").textContent=completion; form.querySelector("#completionRing").style.setProperty("--score",`${completion}%`);
-    form.querySelector("#scoreValue").textContent=readiness; form.querySelector("#scoreRing").style.setProperty("--score",`${readiness}%`);
-    const title=form.querySelector("#scoreTitle"), message=form.querySelector("#scoreMessage");
+    const completionValue=document.querySelector("#completionValue"), completionRing=document.querySelector("#completionRing");
+    const scoreValue=document.querySelector("#scoreValue"), scoreRing=document.querySelector("#scoreRing");
+    const title=document.querySelector("#scoreTitle"), message=document.querySelector("#scoreMessage");
+    if(!completionValue||!completionRing||!scoreValue||!scoreRing||!title||!message)return;
+    completionValue.textContent=completion; completionRing.style.setProperty("--score",`${completion}%`);
+    scoreValue.textContent=readiness; scoreRing.style.setProperty("--score",`${readiness}%`);
     if(!award()){title.textContent="Start your application";message.textContent="Select an award to open its tailored application and scoring criteria.";}
     else if(award()==="citation"&&(Number(value("citations"))<500||Number(value("i10index"))<10||Number(value("hindex"))<5)){title.textContent="Threshold not yet met";message.textContent="Citation applicants need 500 citations, i10-index 10 and h-index 5 to meet the minimum threshold.";}
     else if(readiness>=95){title.textContent="Strong preliminary readiness";message.textContent="Your entered information meets the main scoring criteria. Final recognition remains subject to verification.";}
@@ -141,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showStep(index,scroll=true){
     current=Math.max(0,Math.min(index,activeSteps.length-1)); form.querySelectorAll(".form-step").forEach(step=>step.classList.remove("active")); activeSteps[current].classList.add("active");
     [...progress.children].forEach((bar,index)=>bar.classList.toggle("active",index<=current)); back.hidden=current===0;
-    const final=current===activeSteps.length-1; next.hidden=final; submit.hidden=!final; printButton.hidden=!final;
+    const final=Boolean(award())&&activeSteps[current]?.dataset.stepId==="review"; next.hidden=final; submit.hidden=!final; printButton.hidden=!final;
     next.style.display=final?"none":""; submit.style.display=final?"":"none"; printButton.style.display=final?"":"none"; back.style.display=current===0?"none":"";
     if(final)buildSummary();
     if(scroll)window.scrollTo({top:form.getBoundingClientRect().top+window.scrollY-120,behavior:"smooth"});
